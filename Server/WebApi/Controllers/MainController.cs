@@ -9,7 +9,7 @@ namespace WebApi.Controllers;
 public class MainController : ControllerBase
 {
     // GLOBALS
-    internal static readonly int limitLast = 120;
+    internal static readonly int limitLast = 500;
 
     [HttpGet]
     public string Get()

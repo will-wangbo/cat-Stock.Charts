@@ -3,6 +3,7 @@ import {
   Chart,
   ChartDataset
 } from "chart.js";
+import { Guid } from "guid-typescript";
 
 export interface Quote {
   date: Date;
@@ -11,6 +12,21 @@ export interface Quote {
   low: number;
   close: number;
   volume: number;
+}
+
+export interface Price {
+  Open: number;
+  High: number;
+  Low: number;
+  Closed: number;
+  Volume: number;
+  ChangePercent: number;
+  Date: Date;
+  DateType: number;
+  Id: Guid;
+  Market: string;
+  Symbol: string;
+  ItemType: number;
 }
 
 // LISTING
@@ -26,6 +42,29 @@ export interface IndicatorListing {
   chartConfig: ChartConfig | null;
   parameters: IndicatorParamConfig[];
   results: IndicatorResultConfig[];
+}
+
+export interface News {
+  Title: string;
+  Url: string;
+  Author: string;
+  Image: string;
+  Source: string;
+  RelevanceScore: number;
+  SentimentScore: number,
+  SentimentLabel: string;
+  Date: string;
+  DateType: number;
+  Id: string;
+  Market: string,
+  Symbol: string,
+  ItemType: number
+}
+
+
+export interface Portfolios {
+  uer: string;
+  symbol: string;
 }
 
 export interface IndicatorParamConfig {

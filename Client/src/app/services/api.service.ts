@@ -19,18 +19,30 @@ import {
 @Injectable()
 export class ApiService {
 
-  extraBars = 7;
+  extraBars = 0;
 
   constructor(
     private readonly http: HttpClient
   ) { }
 
   getQuotes() {
-    return this.http.get(`${env.api}/quotes`, this.requestHeader());
+    return this.http.get("https://localhost:44392/quotes", this.requestHeader());
+  }
+
+  getPrices() {
+    return this.http.get(`https://localhost:44391/api/StockPrices/AAPL`, this.requestHeader());
   }
 
   getListings() {
     return this.http.get(`${env.api}/indicators`, this.requestHeader());
+  }
+
+  getNews() {
+    return this.http.get(`https://localhost:44391/api/StockNews/TSLA`, this.requestHeader());
+  }
+
+  getPortf() {
+    return this.http.get(`https://localhost:44391/api/portfolios`, this.requestHeader());
   }
 
   getSelection(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
@@ -258,6 +270,14 @@ export class ApiService {
 
     const simpleHeaders = new HttpHeaders()
       .set('Content-Type', 'application/json');
+
+    return { headers: simpleHeaders };
+  }
+
+  requestGPTHeader(): { headers?: HttpHeaders } {
+
+    const simpleHeaders = new HttpHeaders()
+      .set('Content-Type', 'text/plain');
 
     return { headers: simpleHeaders };
   }

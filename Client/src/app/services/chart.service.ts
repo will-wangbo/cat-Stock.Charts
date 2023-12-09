@@ -8,7 +8,7 @@ import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
 import 'src/assets/js/chartjs-chart-financial';
 
-import { enUS } from 'date-fns/locale';
+import { enUS, zhCN } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
 
 import {
@@ -43,7 +43,10 @@ import {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote
+  Quote,
+  Price,
+  News,
+  Portfolios
 } from '../chart/chart.models';
 
 Chart.register(
@@ -251,7 +254,7 @@ export class ChartService {
 
     const axes: ScaleOptions = {
       alignToPixels: true,
-      display: false,
+      display: true,//false,
       type: 'timeseries',
       time: {
         unit: 'day'
@@ -276,7 +279,7 @@ export class ChartService {
         display: false
       },
       grid: {
-        display: false,
+        display: true,//false,
         drawOnChartArea: false
       }
     };
@@ -578,11 +581,23 @@ export class ChartService {
 
   // DATA OPERATIONS
   loadCharts() {
-    this.api.getQuotes()
+    this.api.getPrices()
       .subscribe({
-        next: (quotes: Quote[]) => {
+        next: (quotes: Price[]) => {
 
-          this.loadOverlayChart(quotes);
+          const tQuotes: Quote[] = [];
+          quotes.forEach((q: Price) => {
+            tQuotes.push({
+              date: new Date(q.Date),
+              open: q.Open,
+              high: q.High,
+              low: q.Low,
+              close: q.Closed,
+              volume: q.Volume
+            });
+          });
+
+          this.loadOverlayChart(tQuotes);
 
           // load default selections
           this.api.getListings()
@@ -683,6 +698,7 @@ export class ChartService {
     const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
     chartConfig.options.scales.volumeAxis.max = volumeAxisSize;
 
+
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
     const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
@@ -745,5 +761,94 @@ export class ChartService {
       const element = document.getElementById(id);
       element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
     }, 200);
+  }
+
+
+  loadOverlayGPTChart(prices: Price[]) {
+
+    const chartConfig = this.baseOverlayConfig();
+    const candleOptions = Chart.defaults.elements["candlestick"];
+
+    // custom border colors
+    candleOptions.color.up = '#1B5E20';
+    candleOptions.color.down = '#B71C1C';
+    candleOptions.color.unchanged = '#616161';
+
+    candleOptions.borderColor = {
+      up: candleOptions.color.up,
+      down: candleOptions.color.down,
+      unchanged: candleOptions.color.unchanged
+    };
+
+    const price: FinancialDataPoint[] = [];
+    const volume: ScatterDataPoint[] = [];
+    const barColor: string[] = [];
+
+    let sumVol = 0;
+
+    prices.forEach((q: Price) => {
+
+      price.push({
+        x: new Date(q.Date).valueOf(),
+        o: q.Open,
+        h: q.High,
+        l: q.Low,
+        c: q.Closed
+      });
+
+      volume.push({
+        x: new Date(q.Date).valueOf(),
+        y: q.Volume
+      });
+      sumVol += q.Volume;
+
+      const c = (q.Closed >= q.Open) ? '#1B5E2060' : '#B71C1C60';
+      barColor.push(c);
+    });
+
+    // add extra bars
+    const nextDate = new Date(Math.max.apply(null, prices.map(h => new Date(h.Date))));
+
+    for (let i = 1; i < this.api.extraBars; i++) {
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      // intentionally excluding price (gap covered by volume)
+      volume.push({
+        x: new Date(nextDate).valueOf(),
+        y: null
+      });
+    }
+
+    // define base datasets
+    chartConfig.data = {
+      datasets: [
+        {
+          type: 'candlestick',
+          label: 'Price',
+          data: price,
+          yAxisID: 'yAxis',
+          borderColor: candleOptions.borderColor,
+          order: 75
+        },
+        {
+          type: 'bar',
+          label: 'Volume',
+          data: volume,
+          yAxisID: 'volumeAxis',
+          backgroundColor: barColor,
+          borderWidth: 0,
+          order: 76
+        }
+      ]
+    };
+
+    // get size for volume axis
+    const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
+    //chartConfig.options.scales.volumeAxis.max = volumeAxisSize;
+
+    // compose chart
+    if (this.chartOverlay) this.chartOverlay.destroy();
+    const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
+    this.chartOverlay = new Chart(myCanvas.getContext('2d'), chartConfig);
   }
 }

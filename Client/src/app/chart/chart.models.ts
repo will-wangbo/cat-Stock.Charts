@@ -14,6 +14,15 @@ export interface Quote {
   volume: number;
 }
 
+export interface TQuote {
+  Date: Date;
+  Open: number;
+  High: number;
+  Low: number;
+  Close: number;
+  Volume: number;
+}
+
 export interface Price {
   Open: number;
   High: number;

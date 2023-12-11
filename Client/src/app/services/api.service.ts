@@ -19,30 +19,18 @@ import {
 @Injectable()
 export class ApiService {
 
-  extraBars = 0;
+  extraBars = 7;
 
   constructor(
     private readonly http: HttpClient
   ) { }
 
   getQuotes() {
-    return this.http.get("https://localhost:44392/quotes", this.requestHeader());
-  }
-
-  getPrices() {
-    return this.http.get(`https://localhost:44391/api/StockPrices/AAPL`, this.requestHeader());
+    return this.http.get("https://localhost:44391/api/IndicatorMain/quotes", this.requestHeader());
   }
 
   getListings() {
-    return this.http.get(`${env.api}/indicators`, this.requestHeader());
-  }
-
-  getNews() {
-    return this.http.get(`https://localhost:44391/api/StockNews/TSLA`, this.requestHeader());
-  }
-
-  getPortf() {
-    return this.http.get(`https://localhost:44391/api/portfolios`, this.requestHeader());
+    return this.http.get(`https://localhost:44391/api/IndicatorMain/indicators`, this.requestHeader());
   }
 
   getSelection(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
@@ -54,7 +42,7 @@ export class ApiService {
     const obs = new Observable((observer) => {
 
       // compose url
-      let url = `${listing.endpoint}?`;
+      let url =  `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
         if (param_index != 0) url += "&";
         url += `${param.paramName}=${param.value}`;

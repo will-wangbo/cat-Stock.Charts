@@ -46,7 +46,8 @@ import {
   Quote,
   Price,
   News,
-  Portfolios
+  Portfolios,
+  TQuote
 } from '../chart/chart.models';
 
 Chart.register(
@@ -265,14 +266,14 @@ export class ChartService {
         },
       },
       ticks: {
-        display: false,
+        display: true,
         source: "auto",
         padding: 0,
         autoSkip: true,
         maxRotation: 0,
         minRotation: 0,
         font: {
-          size: 9
+          size: 7
         },
       },
       border: {
@@ -581,23 +582,23 @@ export class ChartService {
 
   // DATA OPERATIONS
   loadCharts() {
-    this.api.getPrices()
+    this.api.getQuotes()
       .subscribe({
-        next: (quotes: Price[]) => {
-
-          const tQuotes: Quote[] = [];
-          quotes.forEach((q: Price) => {
-            tQuotes.push({
-              date: new Date(q.Date),
-              open: q.Open,
-              high: q.High,
-              low: q.Low,
-              close: q.Closed,
-              volume: q.Volume
-            });
-          });
-
-          this.loadOverlayChart(tQuotes);
+        next: (quotes: Quote[]) => {
+          /*
+                    const tQuotes: Quote[] = [];
+                    quotes.forEach((q: TQuote) => {
+                      tQuotes.push({
+                        date: new Date(q.Date),
+                        open: q.Open,
+                        high: q.High,
+                        low: q.Low,
+                        close: q.Close,
+                        volume: q.Volume
+                      });
+                    });
+          */
+          this.loadOverlayChart(quotes);
 
           // load default selections
           this.api.getListings()

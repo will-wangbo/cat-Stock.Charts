@@ -345,7 +345,6 @@ export class ChartService {
     this.api.getSelection(selection, listing)
       .subscribe({
         next: (selectionWithData: IndicatorSelection) => {
-
           this.displaySelection(selectionWithData, listing, false);
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
@@ -648,6 +647,8 @@ export class ChartService {
         l: q.low,
         c: q.close
       });
+      
+      this.api.alldates.push(q.date);
 
       volume.push({
         x: new Date(q.date).valueOf(),
@@ -670,6 +671,8 @@ export class ChartService {
         x: new Date(nextDate).valueOf(),
         y: null
       });
+
+      this.api.alldates.push(nextDate);
     }
 
     // define base datasets
@@ -736,6 +739,9 @@ export class ChartService {
 
       const def6 = this.defaultSelection("MACD");
       this.addSelectionWithoutScroll(def6);
+
+      const def7 = this.defaultSelection("LINEARVS");
+      this.addSelectionWithoutScroll(def7);
     }
   }
 

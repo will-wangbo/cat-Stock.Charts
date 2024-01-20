@@ -20,6 +20,7 @@ import {
 export class ApiService {
 
   extraBars = 7;
+  alldates = [];
 
   constructor(
     private readonly http: HttpClient
@@ -100,10 +101,22 @@ export class ApiService {
                     pointRotation.push(0);
                   }
 
+                  let bValidData = false;
+                  this.alldates.forEach(element => {
+                    let eleDate = new Date(element);
+                    let comDate = new Date(row.date);
+                    if (eleDate.valueOf() == comDate.valueOf()){
+                      bValidData = true;
+                    }
+                  });
+
+                  if(bValidData) {
                   data.push({
                     x: new Date(row.date).valueOf(),
                     y: yValue
                   });
+                }
+
                 });
 
                 // add extra bars

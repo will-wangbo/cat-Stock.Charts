@@ -122,7 +122,7 @@ export class ApiService {
                 // add extra bars
                 const nextDate = new Date(Math.max.apply(null, data.map(h => new Date(h.x))));
 
-                for (let i = 1; i < this.extraBars; i++) {
+                for (let i = 1; i < this.extraBars-7; i++) {
                   nextDate.setDate(nextDate.getDate() + 1);
                   data.push({
                     x: new Date(nextDate).valueOf(),

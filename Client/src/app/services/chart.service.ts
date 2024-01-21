@@ -672,7 +672,7 @@ export class ChartService {
         y: null
       });
 
-      this.api.alldates.push(nextDate);
+      //this.api.alldates.push(nextDate);
     }
 
     // define base datasets
